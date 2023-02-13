@@ -1,6 +1,7 @@
-import { useState, useCallback } from 'react';
-import { Step } from './types';
-import { isFunction } from './utils';
+import { useState, useCallback, useEffect } from "react";
+import { setNestedObjectValues } from "formik";
+import { Step } from "./types";
+import { isFunction } from "./utils";
 
 const useWizard = (
   activeStepIndex: number,
@@ -12,6 +13,9 @@ const useWizard = (
   const isPrevDisabled: boolean = currentStep === 0;
   const isFirstStep: boolean = currentStep === 0;
   const isLastStep: boolean = currentStep >= total - 1;
+  useEffect(() => {
+    setCurrentStep(activeStepIndex);
+  }, [setCurrentStep, activeStepIndex]);
   const goToPrev = useCallback(
     () => setCurrentStep(Math.max(0, currentStep - 1)),
     [setCurrentStep, currentStep]
@@ -48,6 +52,7 @@ const useWizard = (
 
       if (validateOnNext) {
         const errors = await formikBag.validateForm();
+        formikBag.setTouched(setNestedObjectValues(errors, true));
         isValid = Object.keys(errors).length === 0;
       }
 
